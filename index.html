@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moose Driver — Travel Med Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+/* ─────────────────────────────────────────────
+   DESIGN: Military minimalist. Deep forest
+   greens, slate, off-white. Oswald for headings
+   (military stencil energy), Source Sans for
+   body. Moose silhouette SVG mark. Cascades
+   ridge-line as a subtle background element.
+   Clean, mission-brief aesthetic.
+───────────────────────────────────────────── */
+
+:root {
+  --forest:    #1a2e1a;
+  --forest2:   #223022;
+  --forest3:   #2a3d2a;
+  --slate:     #0f1a1f;
+  --slate2:    #152028;
+  --slate3:    #1d2e38;
+  --border:    #2d3f2d;
+  --border2:   #1e3040;
+  --sage:      #4a7c4a;
+  --sage-light:#5e9e5e;
+  --moss:      #3d6b3d;
+  --khaki:     #c8b98a;
+  --khaki-dim: #6b5f3a;
+  --white:     #e8ede8;
+  --offwhite:  #c8d0c8;
+  --muted:     #7a8f7a;
+  --faint:     #3a4a3a;
+  --green-ok:  #2d7d4a;
+  --green-bg:  #0c1f12;
+  --amber:     #d4880a;
+  --amber-bg:  #1a1205;
+  --red:       #b03030;
+  --red-bg:    #1a0808;
+  --mono:      'Share Tech Mono', monospace;
+  --head:      'Oswald', sans-serif;
+  --body:      'Source Sans 3', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--slate);
+  color: var(--white);
+  font-family: var(--body);
+  font-weight: 300;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* ── MOUNTAIN RIDGE BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 220px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220' preserveAspectRatio='none'%3E%3Cpath d='M0,220 L0,160 L60,130 L120,145 L180,100 L240,115 L300,70 L360,90 L420,55 L480,75 L520,40 L560,60 L600,30 L640,50 L680,20 L720,45 L760,25 L800,55 L840,35 L880,65 L920,42 L960,70 L1020,50 L1080,80 L1140,60 L1200,90 L1260,70 L1320,100 L1380,80 L1440,110 L1440,220 Z' fill='%23192819' opacity='0.7'/%3E%3Cpath d='M0,220 L0,185 L80,165 L160,175 L240,145 L320,158 L400,130 L460,142 L520,118 L580,132 L640,108 L700,122 L760,100 L820,115 L880,98 L940,112 L1000,95 L1080,110 L1160,98 L1240,115 L1320,105 L1440,120 L1440,220 Z' fill='%231a2a1a' opacity='0.9'/%3E%3C/svg%3E") no-repeat bottom center;
+  background-size: 100% 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: sticky; top: 0; z-index: 1000;
+  background: var(--forest);
+  border-bottom: 1px solid var(--border);
+  height: 58px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.5);
+}
+
+/* Moose SVG logo */
+.moose-mark {
+  width: 38px; height: 38px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(74,124,74,0.4));
+}
+
+.header-title {
+  display: flex; flex-direction: column; gap: 1px;
+  flex: 1;
+}
+.header-name {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+  line-height: 1;
+}
+.header-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--sage);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.meta-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-align: right;
+  line-height: 1.7;
+}
+
+.hdr-btn {
+  background: transparent;
+  border: 1px solid var(--sage);
+  color: var(--sage-light);
+  font-family: var(--head);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.hdr-btn:hover {
+  background: var(--sage);
+  color: var(--white);
+}
+
+/* ── MAIN LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  height: calc(100vh - 58px);
+  position: relative; z-index: 1;
+}
+
+/* ── LEFT PANEL ── */
+.panel {
+  background: var(--forest);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Search */
+.search-box {
+  padding: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-tag::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.search-wrap { position: relative; }
+
+.search-input {
+  width: 100%;
+  background: var(--slate2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 10px 38px 10px 13px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  letter-spacing: 0.04em;
+}
+.search-input::placeholder { color: var(--faint); }
+.search-input:focus {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 3px rgba(74,124,74,0.15);
+}
+
+.search-icon {
+  position: absolute;
+  right: 11px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--faint);
+  font-size: 15px;
+  pointer-events: none;
+  font-style: normal;
+}
+
+/* Autocomplete */
+.autocomplete {
+  position: absolute;
+  top: calc(100% + 3px); left: 0; right: 0;
+  background: var(--slate2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 500;
+  display: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+.autocomplete.open { display: block; }
+.ac-item {
+  padding: 8px 13px;
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.1s;
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.active { background: var(--forest3); }
+.ac-name { color: var(--white); }
+.ac-reg  { color: var(--muted); font-size: 10px; }
+
+/* Result area */
+.result-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--faint) transparent;
+}
+
+/* Placeholder */
+.placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+.ph-moose { font-size: 56px; opacity: 0.12; line-height: 1; }
+.ph-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--faint);
+  letter-spacing: 0.12em;
+  line-height: 2;
+  text-transform: uppercase;
+}
+
+/* ── RESULT CARD ── */
+.result-card { display: none; }
+.result-card.visible { display: block; animation: fadeUp 0.22s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Verdict banner */
+.verdict {
+  border-radius: 2px;
+  padding: 15px 16px;
+  margin-bottom: 14px;
+  border-left: 3px solid;
+}
+.verdict-green  { background: var(--green-bg); border-color: var(--green-ok); }
+.verdict-yellow { background: var(--amber-bg); border-color: var(--amber); }
+.verdict-red    { background: var(--red-bg);   border-color: var(--red); }
+
+.v-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.v-icon { font-size: 26px; line-height: 1; }
+.v-country {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+  line-height: 1.1;
+}
+.v-region-who {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.v-status {
+  font-family: var(--head);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.verdict-green  .v-status { color: #5ecc85; }
+.verdict-yellow .v-status { color: #e0a030; }
+.verdict-red    .v-status { color: #d46060; }
+
+/* Info blocks */
+.info-block {
+  background: var(--slate2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.ib-head {
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.03);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sage);
+  border-bottom: 1px solid var(--border2);
+}
+.ib-body { padding: 11px 12px; }
+
+.info-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  align-items: flex-start;
+  font-size: 12.5px;
+}
+.info-row:last-child { margin-bottom: 0; }
+.ir-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  min-width: 96px;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.ir-val { color: var(--white); flex: 1; line-height: 1.5; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.chip-drug   { background: rgba(94,158,94,0.12); color: #8ec88e; border: 1px solid rgba(94,158,94,0.2); }
+.chip-resist { background: rgba(180,60,60,0.1);  color: #d48080; border: 1px solid rgba(180,60,60,0.2); }
+.chip-pv     { background: rgba(74,124,74,0.12); color: #7abf7a; border: 1px solid rgba(74,124,74,0.2); }
+.chip-note   { background: rgba(200,185,138,0.1); color: var(--khaki); border: 1px solid rgba(200,185,138,0.15); }
+
+/* Region list */
+.region-list { list-style: none; }
+.region-list li {
+  padding: 5px 0;
+  font-size: 12px;
+  color: var(--white);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+.region-list li:last-child { border-bottom: none; }
+.rb {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
+  flex-shrink: 0;
+}
+
+/* Flight surgeon card */
+.surgeon-card {
+  background: linear-gradient(160deg, var(--green-bg), var(--forest));
+  border: 1px solid rgba(74,124,74,0.35);
+  border-radius: 2px;
+  padding: 13px;
+  margin-top: 10px;
+}
+.sc-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage-light);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sc-label::after { content:''; flex:1; height:1px; background: rgba(74,124,74,0.25); }
+.sc-name {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 1px;
+}
+.sc-unit {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
+  font-size: 10px;
+}
+.call-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(45,125,74,0.2);
+  border: 1px solid var(--green-ok);
+  border-radius: 2px;
+  padding: 10px 13px;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+  width: 100%;
+}
+.call-btn:hover { background: rgba(45,125,74,0.35); }
+.call-icon { font-size: 20px; }
+.call-info { display: flex; flex-direction: column; gap: 1px; }
+.call-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--sage-light);
+  text-transform: uppercase;
+}
+.call-number {
+  font-family: var(--mono);
+  font-size: 17px;
+  color: var(--white);
+  letter-spacing: 0.08em;
+}
+
+/* Disclaimer */
+.disclaimer {
+  margin-top: 10px;
+  padding: 9px 11px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
+  font-size: 9.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-family: var(--mono);
+  letter-spacing: 0.03em;
+}
+
+/* ── MAP SIDE ── */
+.map-side {
+  position: relative;
+  overflow: hidden;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-container { background: #0a1008 !important; }
+.leaflet-tile-pane { filter: brightness(0.45) saturate(0.3) hue-rotate(80deg) contrast(1.1); }
+.leaflet-control-zoom a {
+  background: var(--forest2) !important;
+  color: var(--offwhite) !important;
+  border-color: var(--border) !important;
+}
+.leaflet-control-attribution {
+  background: rgba(15,26,15,0.8) !important;
+  color: var(--faint) !important;
+  font-size: 9px !important;
+}
+
+.map-overlay-label {
+  position: absolute;
+  top: 14px; right: 14px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage);
+  background: rgba(26,46,26,0.85);
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 500;
+}
+
+/* Map tooltip */
+.map-tooltip {
+  background: var(--forest2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 5px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(3px);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--forest);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  width: 420px;
+  max-width: 94vw;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+  transform: translateY(12px);
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-head {
+  background: var(--forest2);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+.modal-close {
+  background: none; border: none;
+  color: var(--muted); font-size: 20px;
+  cursor: pointer; line-height: 1;
+  padding: 0 4px;
+  transition: color 0.1s;
+}
+.modal-close:hover { color: var(--white); }
+
+.modal-body { padding: 20px 18px; }
+
+.modal-surgeon-name {
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+.modal-surgeon-unit {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.modal-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+.modal-info-row:last-of-type { border-bottom: none; margin-bottom: 0; }
+.modal-info-icon { font-size: 20px; width: 28px; text-align: center; flex-shrink: 0; }
+.modal-info-content { display: flex; flex-direction: column; gap: 2px; }
+.modal-info-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+.modal-info-value {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--white);
+  letter-spacing: 0.06em;
+}
+
+.modal-call-btn {
+  display: block;
+  margin-top: 18px;
+  background: rgba(45,125,74,0.2);
+  border: 1px solid var(--green-ok);
+  border-radius: 2px;
+  padding: 13px 18px;
+  text-decoration: none;
+  text-align: center;
+  font-family: var(--head);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.modal-call-btn:hover { background: rgba(45,125,74,0.4); }
+
+.modal-disclaimer {
+  margin-top: 14px;
+  font-size: 9.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* Responsive tweaks */
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .map-side { display: none; }
+  body { overflow: auto; }
+  .panel { height: calc(100vh - 58px); }
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <!-- Moose SVG mark -->
+  <svg class="moose-mark" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- Antlers -->
+    <path d="M28 22 L18 8 L14 14 L20 18" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M18 8 L22 4 L24 10" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <path d="M28 22 L36 10 L32 6 L30 14" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M36 10 L40 6 L38 13" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <!-- Neck & head -->
+    <path d="M26 28 Q24 24 28 22 Q34 20 36 24 Q38 28 36 32 L34 36" stroke="#5e9e5e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <!-- Snout -->
+    <path d="M34 36 Q36 40 38 42 Q34 44 32 42 L30 38" stroke="#5e9e5e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <!-- Body -->
+    <path d="M26 36 Q20 40 18 50 Q18 60 22 64 L24 72" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <path d="M34 36 Q42 40 44 50 Q44 60 40 64 L38 72" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <!-- Front legs -->
+    <path d="M22 52 L20 68 L22 72" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <path d="M40 52 L42 68 L40 72" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <!-- Shoulder hump -->
+    <path d="M18 42 Q24 36 30 38 Q38 38 44 42" stroke="#5e9e5e" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </svg>
+
+  <div class="header-title">
+    <div class="header-name">Moose Driver</div>
+    <div class="header-sub">Travel Med Advisor · JBLM C-17</div>
+  </div>
+
+  <div class="header-meta">
+    <div class="meta-tag">
+      DATA: CDC YELLOW BOOK 2026<br>
+      WHO WMR 2025 · APR 2025
+    </div>
+    <button class="hdr-btn" onclick="openModal()">✆ Flight Surgeon</button>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <div class="panel">
+
+    <!-- Search -->
+    <div class="search-box">
+      <div class="section-tag">Destination Lookup</div>
+      <div class="search-wrap">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="TYPE COUNTRY NAME…"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <span class="search-icon">⌕</span>
+        <div class="autocomplete" id="autocomplete"></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="result-area" id="resultArea">
+
+      <!-- Placeholder -->
+      <div class="placeholder" id="placeholder">
+        <div class="ph-moose">🫎</div>
+        <div class="ph-text">
+          Type a country name above<br>
+          or click a country on the map<br>
+          ─────────────────<br>
+          Mission brief will appear here
+        </div>
+      </div>
+
+      <!-- Result card (hidden until lookup) -->
+      <div class="result-card" id="resultCard">
+
+        <!-- Verdict banner -->
+        <div class="verdict" id="verdictBanner">
+          <div class="v-top">
+            <div class="v-icon" id="vIcon"></div>
+            <div>
+              <div class="v-country" id="vCountry"></div>
+              <div class="v-region-who" id="vRegionWho"></div>
+            </div>
+          </div>
+          <div class="v-status" id="vStatus"></div>
+        </div>
+
+        <!-- CDC Recommendation -->
+        <div class="info-block" id="cdcBlock">
+          <div class="ib-head">CDC Chemoprophylaxis Recommendation</div>
+          <div class="ib-body" id="cdcBody"></div>
+        </div>
+
+        <!-- Malaria details -->
+        <div class="info-block" id="malariaBlock">
+          <div class="ib-head">Malaria Profile · WHO 2025</div>
+          <div class="ib-body" id="malariaBody"></div>
+        </div>
+
+        <!-- Regional areas (shown only for partial) -->
+        <div class="info-block" id="regionsBlock" style="display:none">
+          <div class="ib-head">⚠ Regions Requiring Prophylaxis</div>
+          <div class="ib-body" id="regionsBody"></div>
+        </div>
+
+        <!-- Surgeon card -->
+        <div class="surgeon-card" id="surgeonCard">
+          <div class="sc-label">JBLM Flight Surgeon</div>
+          <div class="sc-name">Flight Surgeon</div>
+          <div class="sc-unit">JBLM · Joint Base Lewis-McChord, WA</div>
+          <a class="call-btn" href="tel:2532798460">
+            <span class="call-icon">📞</span>
+            <div class="call-info">
+              <span class="call-label">DSN / Commercial</span>
+              <span class="call-number">253-279-8460</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+          ⚠ FOR CREW REFERENCE ONLY — NOT A SUBSTITUTE FOR MEDICAL ADVICE.<br>
+          VERIFY WITH JBLM FLIGHT SURGEON BEFORE TRAVEL. DATA: CDC YELLOW BOOK 2026 / WHO WMR 2025.
+        </div>
+
+      </div><!-- /result-card -->
+    </div><!-- /result-area -->
+  </div><!-- /panel -->
+
+  <!-- MAP SIDE -->
+  <div class="map-side">
+    <div class="map-overlay-label">CLICK COUNTRY TO LOOK UP</div>
+    <div id="map"></div>
+  </div>
+
+</div><!-- /layout -->
+
+<!-- ── FLIGHT SURGEON MODAL ── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalIfBg(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">JBLM Flight Surgeon Contact</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-surgeon-name">Flight Surgeon</div>
+      <div class="modal-surgeon-unit">JBLM · Joint Base Lewis-McChord, Washington State</div>
+
+      <div class="modal-info-row">
+        <span class="modal-info-icon">📞</span>
+        <div class="modal-info-content">
+          <span class="modal-info-label">Commercial</span>
+          <span class="modal-info-value">253-279-8460</span>
+        </div>
+      </div>
+      <div class="modal-info-row">
+        <span class="modal-info-icon">📍</span>
+        <div class="modal-info-content">
+          <span class="modal-info-label">Installation</span>
+          <span class="modal-info-value">Joint Base Lewis-McChord, WA</span>
+        </div>
+      </div>
+      <div class="modal-info-row">
+        <span class="modal-info-icon">✈️</span>
+        <div class="modal-info-content">
+          <span class="modal-info-label">Unit</span>
+          <span class="modal-info-value">C-17 Aircrew Medicine</span>
+        </div>
+      </div>
+
+      <a class="modal-call-btn" href="tel:2532798460">📞 &nbsp;Call 253-279-8460</a>
+      <div class="modal-disclaimer">
+        Contact flight surgeon prior to any mission requiring malaria chemoprophylaxis.<br>
+        Individual medical history and itinerary will determine final recommendation.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  MALARIA DATA
+//  [Country, WHO Region, NonPfPct, DominantNonPf,
+//   cdcStatus, drugs[], resistance, cdcAreaNotes, [regions if partial]]
+//  cdcStatus: "green" | "yellow" | "red"
+//    green  = no prophylaxis needed
+//    yellow = partial / area-specific → see flight surgeon
+//    red    = prophylaxis recommended all areas
+// ══════════════════════════════════════════════
+const COUNTRIES = [
+  // ── AFRICA ──
+  {name:"Angola",          who:"Africa",    nonPf:2,   sp:"P. malariae / P. ovale", status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Benin",           who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Botswana",        who:"Africa",    nonPf:4,   sp:"P. malariae",             status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Northern/eastern districts only", regions:["Bobirwa","Boteti","Chobe (incl. Chobe National Park)","Ghanzi","Mahalapye","Ngamiland","North East","Okavango","Serowe/Palapye","Tutume"]},
+  {name:"Burkina Faso",    who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Burundi",         who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Cameroon",        who:"Africa",    nonPf:2,   sp:"P. malariae / P. ovale",  status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Central African Republic", who:"Africa", nonPf:1, sp:"P. malariae",        status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Chad",            who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Comoros",         who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Congo",           who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas (Congo-Brazzaville)", regions:[]},
+  {name:"Cote d'Ivoire",   who:"Africa",    nonPf:2,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Democratic Republic of the Congo", who:"Africa", nonPf:2, sp:"P. malariae / P. ovale", status:"red", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Djibouti",        who:"Africa",    nonPf:35,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax 30–40%", regions:[]},
+  {name:"Equatorial Guinea",who:"Africa",   nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Eritrea",         who:"Africa",    nonPf:18,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas <2,200 m elevation; P. vivax 15–20%", regions:[]},
+  {name:"Eswatini",        who:"Africa",    nonPf:3,   sp:"P. malariae",             status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Eastern border regions only", regions:["Lubombo Region (entire)","Eastern Hhohho","Eastern Manzini","Eastern Shiselweni"]},
+  {name:"Ethiopia",        who:"Africa",    nonPf:30,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas <2,500 m; P. vivax ~30%", regions:[]},
+  {name:"Gabon",           who:"Africa",    nonPf:2,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Gambia",          who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Ghana",           who:"Africa",    nonPf:2,   sp:"P. malariae / P. ovale",  status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Guinea",          who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Guinea-Bissau",   who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Kenya",           who:"Africa",    nonPf:5,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; Nairobi generally low risk", regions:[]},
+  {name:"Liberia",         who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Madagascar",      who:"Africa",    nonPf:6,   sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Malawi",          who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Mali",            who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Mauritania",      who:"Africa",    nonPf:12,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Southern regions", regions:[]},
+  {name:"Mozambique",      who:"Africa",    nonPf:2,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Namibia",         who:"Africa",    nonPf:4,   sp:"P. vivax / P. malariae",  status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Northern regions only", regions:["Kavango East","Kavango West","Kunene","Ohangwena","Omusati","Oshana","Oshikoto","Otjozondjupa","Zambezi"]},
+  {name:"Niger",           who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Nigeria",         who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Rwanda",          who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Sao Tome and Principe", who:"Africa", nonPf:1, sp:"P. malariae",            status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Senegal",         who:"Africa",    nonPf:3,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Sierra Leone",    who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Somalia",         who:"Africa",    nonPf:25,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax ~25%", regions:[]},
+  {name:"South Africa",    who:"Africa",    nonPf:3,   sp:"P. vivax / P. malariae",  status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Northern/eastern border areas only", regions:["Limpopo (Kruger Park area)","Mpumalanga (lowveld)","KwaZulu-Natal (northern border)"]},
+  {name:"South Sudan",     who:"Africa",    nonPf:2,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Sudan",           who:"Africa",    nonPf:30,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax significant in north", regions:[]},
+  {name:"Tanzania",        who:"Africa",    nonPf:2,   sp:"P. malariae / P. ovale",  status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas including Zanzibar", regions:[]},
+  {name:"Togo",            who:"Africa",    nonPf:1,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Uganda",          who:"Africa",    nonPf:2,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Zambia",          who:"Africa",    nonPf:2,   sp:"P. malariae",             status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Zimbabwe",        who:"Africa",    nonPf:3,   sp:"P. vivax / P. malariae",  status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  // ── AMERICAS ──
+  {name:"Bolivia",         who:"Americas",  nonPf:99,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Primaquine","Tafenoquine"], resist:"CQ-R", note:"All areas <2,500 m; P. vivax 99%", regions:[]},
+  {name:"Brazil",          who:"Americas",  nonPf:90,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Amazon basin states only; P. vivax 90%", regions:["Acre","Amapá","Amazonas","Rondônia","Roraima","Maranhão (parts)","Mato Grosso (parts)","Pará (parts)"]},
+  {name:"Colombia",        who:"Americas",  nonPf:50,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas <1,700 m; P. vivax 50%", regions:[]},
+  {name:"Costa Rica",      who:"Americas",  nonPf:14,  sp:"P. falciparum primarily", status:"yellow", drugs:["A-P","Chloroquine","Dox","Mefloquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"Specific provinces only", regions:["Alajuela Province","Limón Province"]},
+  {name:"Dominican Republic", who:"Americas", nonPf:0, sp:"P. falciparum only",      status:"yellow", drugs:["A-P","Chloroquine","Dox","Mefloquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"Specific provinces and resort areas; P. falciparum 100%", regions:["Azua Province","Elias Piña Province","La Altagracia Province (incl. resort areas)","San Juan Province","Santo Domingo Province"]},
+  {name:"Ecuador",         who:"Americas",  nonPf:85,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"6 Andean border provinces only; avoid-only elsewhere; P. vivax 85%", regions:["Cotopaxi","Esmeraldas","Morona-Santiago","Orellana","Pastaza","Sucumbíos"]},
+  {name:"French Guiana",   who:"Americas",  nonPf:55,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax 55%", regions:[]},
+  {name:"Guatemala",       who:"Americas",  nonPf:90,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Chloroquine","Dox","Mefloquine","Primaquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"Specific departments only; CQ-sensitive", regions:["Alta Verapaz","Baja Verapaz","Escuintla","Izabal","Petén"]},
+  {name:"Guyana",          who:"Americas",  nonPf:40,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax 40%", regions:[]},
+  {name:"Haiti",           who:"Americas",  nonPf:0,   sp:"P. falciparum only",       status:"red",    drugs:["A-P","Chloroquine","Dox","Mefloquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"All areas; P. falciparum 100%; CQ-sensitive", regions:[]},
+  {name:"Honduras",        who:"Americas",  nonPf:80,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Chloroquine","Dox","Mefloquine","Primaquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"Rural areas only; CQ-sensitive; P. vivax dominant", regions:["Rural areas of La Mosquitia","Olancho (rural)","Yoro (rural)","Colón"]},
+  {name:"Mexico",          who:"Americas",  nonPf:90,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Chloroquine","Dox","Mefloquine","Primaquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"Selected rural states only; CQ-sensitive", regions:["Chiapas (rural)","Chihuahua (rural)","Oaxaca (rural)","Sinaloa (rural)","Sonora (rural)"]},
+  {name:"Nicaragua",       who:"Americas",  nonPf:80,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Chloroquine","Dox","Mefloquine","Primaquine","Tafenoquine"], resist:"None (CQ-sensitive)", note:"Rural areas only; CQ-sensitive; P. vivax dominant", regions:["RAAN (North Atlantic Autonomous Region)","RAAS (South Atlantic Autonomous Region)","Jinotega (rural)","Matagalpa (rural)"]},
+  {name:"Panama",          who:"Americas",  nonPf:68,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"East of Canal only; no prophylaxis west of Canal", regions:["Darién Province","Guna Yala (San Blas)"]},
+  {name:"Peru",            who:"Americas",  nonPf:80,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Amazon departments only; P. vivax 80%", regions:["Loreto","Madre de Dios","Ucayali","Amazonas (dept.)","San Martín (rural)"]},
+  {name:"Venezuela",       who:"Americas",  nonPf:75,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax 75%", regions:[]},
+  // ── SOUTH-EAST ASIA ──
+  {name:"Bangladesh",      who:"SE Asia",   nonPf:20,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"CHT and border districts; Pf 80% / Pv 20%", regions:[]},
+  {name:"India",           who:"SE Asia",   nonPf:43,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax ~43% nationally", regions:[]},
+  {name:"Indonesia",       who:"SE Asia",   nonPf:40,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R / CQ+MQ-R (Papua)", note:"All areas; Pf 60%/Pv 40%; CQ+MQ resistant in Papua", regions:[]},
+  {name:"Myanmar",         who:"SE Asia",   nonPf:80,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Tafenoquine"], resist:"CQ-R / MQ-R", note:"All areas; Mefloquine NOT recommended; P. vivax 80%", regions:[]},
+  {name:"Nepal",           who:"SE Asia",   nonPf:78,  sp:"P. vivax",                status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Terai districts; P. vivax 78%", regions:[]},
+  {name:"Thailand",        who:"SE Asia",   nonPf:65,  sp:"P. vivax",                status:"yellow", drugs:["A-P","Dox","Tafenoquine"], resist:"CQ-R / MQ-R", note:"Rural border areas only; Mefloquine NOT recommended; P. vivax 65%", regions:["Thai-Myanmar border areas","Thai-Cambodia border areas","Thai-Malaysia border (Narathiwat, Pattani, Yala, Songkhla)"]},
+  // ── EASTERN MEDITERRANEAN ──
+  {name:"Afghanistan",     who:"E Mediterranean", nonPf:95, sp:"P. vivax",           status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas <2,500 m (Apr–Dec); P. vivax 95%", regions:[]},
+  {name:"Iran",            who:"E Mediterranean", nonPf:90, sp:"P. vivax",           status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Sistan-Baluchestan Province only; avoid-only elsewhere; P. vivax 90%", regions:["Sistan-Baluchestan Province (Pakistan border area)"]},
+  {name:"Iraq",            who:"E Mediterranean", nonPf:40, sp:"P. vivax",           status:"green",  drugs:[], resist:"None", note:"Sporadic only — mosquito avoidance, no chemoprophylaxis recommended", regions:[]},
+  {name:"Pakistan",        who:"E Mediterranean", nonPf:81, sp:"P. vivax",           status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. vivax 81%", regions:[]},
+  {name:"Saudi Arabia",    who:"E Mediterranean", nonPf:30, sp:"P. vivax",           status:"yellow", drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"Southwestern provinces near Yemen border only", regions:["Asir Province","Jizan Province"]},
+  {name:"Syria",           who:"E Mediterranean", nonPf:null, sp:"P. vivax",         status:"green",  drugs:[], resist:"None", note:"Sporadic residual foci only — mosquito avoidance, no chemoprophylaxis recommended", regions:[]},
+  {name:"Yemen",           who:"E Mediterranean", nonPf:25, sp:"P. vivax",           status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas; P. falciparum dominant; P. vivax 25%", regions:[]},
+  // ── WESTERN PACIFIC ──
+  {name:"Cambodia",        who:"W Pacific",  nonPf:95,  sp:"P. vivax",               status:"yellow", drugs:["A-P","Dox","Primaquine","Tafenoquine"], resist:"CQ-R / MQ-R", note:"Rural/forested areas only; Mefloquine NOT recommended; P. vivax 95%", regions:["Pailin Province","Pursat Province (forest)","Koh Kong Province (forest)","Battambang (border forest)","Mondulkiri","Ratanakiri"]},
+  {name:"Korea",           who:"W Pacific",  nonPf:100, sp:"P. vivax",               status:"green",  drugs:[], resist:"None", note:"Near-DMZ rural areas only; P. vivax only; mosquito avoidance recommended, no chemoprophylaxis", regions:[]},
+  {name:"Laos",            who:"W Pacific",  nonPf:60,  sp:"P. vivax",               status:"yellow", drugs:["A-P","Dox","Tafenoquine"], resist:"CQ-R / MQ-R", note:"Rural areas; Mefloquine NOT recommended; P. vivax 60%", regions:["Attapeu Province","Savannakhet (rural)","Sekong Province","Saravan Province"]},
+  {name:"Malaysia",        who:"W Pacific",  nonPf:null, sp:"P. knowlesi (zoonotic)", status:"green",  drugs:[], resist:"None", note:"Zero human-species indigenous cases; P. knowlesi zoonotic only in forested areas — mosquito avoidance for forest/jungle operations", regions:[]},
+  {name:"Papua New Guinea",who:"W Pacific",  nonPf:25,  sp:"P. vivax",               status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R / MQ-R", note:"All areas; CQ-resistant P. vivax confirmed", regions:[]},
+  {name:"Philippines",     who:"W Pacific",  nonPf:30,  sp:"P. vivax",               status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas except Manila and Cebu City; P. vivax 30%", regions:[]},
+  {name:"Solomon Islands", who:"W Pacific",  nonPf:20,  sp:"P. vivax",               status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Vanuatu",         who:"W Pacific",  nonPf:18,  sp:"P. vivax",               status:"red",    drugs:["A-P","Dox","Mefloquine","Tafenoquine"], resist:"CQ-R", note:"All areas", regions:[]},
+  {name:"Vietnam",         who:"W Pacific",  nonPf:60,  sp:"P. vivax",               status:"yellow", drugs:["A-P","Dox","Primaquine","Tafenoquine"], resist:"CQ-R / MQ-R", note:"Rural/forested areas only; Mefloquine NOT recommended; P. vivax 60%", regions:["Central Highlands (Dak Lak, Dak Nong, Gia Lai, Kon Tum)","Southern provinces (Binh Phuoc, Tay Ninh)","Border areas with Cambodia and Laos"]},
+];
+
+// Index for fast lookup
+const INDEX = {};
+COUNTRIES.forEach(c => {
+  INDEX[c.name.toLowerCase()] = c;
+  // Common aliases
+  const aliases = {
+    "drc":"Democratic Republic of the Congo","dr congo":"Democratic Republic of the Congo",
+    "congo kinshasa":"Democratic Republic of the Congo","congo brazzaville":"Congo",
+    "ivory coast":"Cote d'Ivoire","côte d'ivoire":"Cote d'Ivoire",
+    "myanmar":"Myanmar","burma":"Myanmar",
+    "lao pdr":"Laos","lao":"Laos","lao people's democratic republic":"Laos",
+    "viet nam":"Vietnam","korea republic":"Korea","south korea":"Korea","republic of korea":"Korea",
+    "sao tome":"Sao Tome and Principe","são tomé":"Sao Tome and Principe",
+    "eswatini":"Eswatini","swaziland":"Eswatini",
+    "french guiana":"French Guiana",
+    "dominican republic":"Dominican Republic","dr":"Dominican Republic",
+    "papua new guinea":"Papua New Guinea","png":"Papua New Guinea",
+    "solomon islands":"Solomon Islands","solomons":"Solomon Islands",
+    "central african republic":"Central African Republic","car":"Central African Republic",
+    "guinea bissau":"Guinea-Bissau",
+    "equatorial guinea":"Equatorial Guinea",
+    "sierra leone":"Sierra Leone",
+    "south africa":"South Africa",
+    "south sudan":"South Sudan",
+  };
+  if (aliases[c.name.toLowerCase()]) INDEX[c.name.toLowerCase()] = c;
+};
+Object.entries({
+  "drc":"Democratic Republic of the Congo","dr congo":"Democratic Republic of the Congo",
+  "congo kinshasa":"Democratic Republic of the Congo","congo brazzaville":"Congo",
+  "ivory coast":"Cote d'Ivoire","côte d'ivoire":"Cote d'Ivoire",
+  "burma":"Myanmar","lao pdr":"Laos","lao":"Laos",
+  "viet nam":"Vietnam","korea republic":"Korea","south korea":"Korea","republic of korea":"Korea",
+  "sao tome":"Sao Tome and Principe","são tomé":"Sao Tome and Principe",
+  "swaziland":"Eswatini","png":"Papua New Guinea","solomons":"Solomon Islands",
+  "car":"Central African Republic","guinea bissau":"Guinea-Bissau",
+}).forEach(([k,v]) => { INDEX[k] = INDEX[v.toLowerCase()] || COUNTRIES.find(c=>c.name===v); });
+
+// ── RENDER RESULT ──
+function showResult(country) {
+  const ph = document.getElementById('placeholder');
+  const card = document.getElementById('resultCard');
+  const banner = document.getElementById('verdictBanner');
+
+  ph.style.display = 'none';
+  card.classList.add('visible');
+
+  // Verdict
+  banner.className = 'verdict verdict-' + country.status;
+  document.getElementById('vIcon').textContent =
+    country.status === 'green' ? '✅' : country.status === 'yellow' ? '⚠️' : '🔴';
+  document.getElementById('vCountry').textContent = country.name;
+  document.getElementById('vRegionWho').textContent = 'WHO Region: ' + country.who;
+  document.getElementById('vStatus').textContent =
+    country.status === 'green'  ? 'No Malaria Chemoprophylaxis Required' :
+    country.status === 'yellow' ? 'Prophylaxis Required — Area-Specific — See Flight Surgeon' :
+                                  'Malaria Chemoprophylaxis Recommended — All Areas';
+
+  // CDC block
+  const cdcBody = document.getElementById('cdcBody');
+  if (country.status === 'green') {
+    cdcBody.innerHTML = `
+      <div class="info-row">
+        <div class="ir-label">Status</div>
+        <div class="ir-val" style="color:#5ecc85">No chemoprophylaxis recommended. Maintain standard mosquito bite precautions.</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-label">Precautions</div>
+        <div class="ir-val">DEET repellent, permethrin-treated clothing, bed nets where applicable.</div>
+      </div>`;
+  } else if (country.status === 'yellow') {
+    cdcBody.innerHTML = `
+      <div class="info-row">
+        <div class="ir-label">Status</div>
+        <div class="ir-val" style="color:#e0a030">Area-specific recommendation. Prophylaxis required only for regions listed below. Contact JBLM Flight Surgeon to confirm based on your exact itinerary.</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-label">Drugs</div>
+        <div class="ir-val"><div class="chips">${country.drugs.map(d=>`<span class="chip chip-drug">${d}</span>`).join('')}</div></div>
+      </div>
+      <div class="info-row">
+        <div class="ir-label">CDC Note</div>
+        <div class="ir-val">${country.note}</div>
+      </div>`;
+  } else {
+    cdcBody.innerHTML = `
+      <div class="info-row">
+        <div class="ir-label">Status</div>
+        <div class="ir-val" style="color:#d46060">Chemoprophylaxis recommended for all at-risk areas. Contact JBLM Flight Surgeon before travel.</div>
+      </div>
+      <div class="info-row">
+        <div class="ir-label">Drugs</div>
+        <div class="ir-val"><div class="chips">${country.drugs.map(d=>`<span class="chip chip-drug">${d}</span>`).join('')}</div></div>
+      </div>
+      <div class="info-row">
+        <div class="ir-label">CDC Note</div>
+        <div class="ir-val">${country.note}</div>
+      </div>`;
+  }
+
+  // Malaria profile
+  const mBody = document.getElementById('malariaBody');
+  mBody.innerHTML = `
+    <div class="info-row">
+      <div class="ir-label">Non-Pf %</div>
+      <div class="ir-val">${country.nonPf !== null ? country.nonPf + '%' : 'Data limited'}</div>
+    </div>
+    <div class="info-row">
+      <div class="ir-label">Non-Pf Species</div>
+      <div class="ir-val"><span class="chip chip-pv">${country.sp}</span></div>
+    </div>
+    <div class="info-row">
+      <div class="ir-label">Drug Resistance</div>
+      <div class="ir-val"><span class="chip chip-resist">${country.resist}</span></div>
+    </div>`;
+
+  // Regions block
+  const regBlock = document.getElementById('regionsBlock');
+  const regBody  = document.getElementById('regionsBody');
+  if (country.status === 'yellow' && country.regions.length) {
+    regBlock.style.display = 'block';
+    regBody.innerHTML = `
+      <div style="font-size:11.5px;color:var(--offwhite);margin-bottom:8px;line-height:1.5;">
+        Prophylaxis is recommended only when traveling to these regions. For other areas, maintain mosquito avoidance precautions only. Always confirm with your flight surgeon based on exact itinerary.
+      </div>
+      <ul class="region-list">
+        ${country.regions.map(r => `<li><span class="rb"></span>${r}</li>`).join('')}
+      </ul>`;
+  } else {
+    regBlock.style.display = 'none';
+  }
+
+  // Scroll to top of result area
+  document.getElementById('resultArea').scrollTop = 0;
+}
+
+// ── SEARCH ──
+const input = document.getElementById('searchInput');
+const ac    = document.getElementById('autocomplete');
+let acIdx   = -1;
+let acItems = [];
+
+input.addEventListener('input', () => {
+  const q = input.value.trim().toLowerCase();
+  ac.innerHTML = '';
+  acIdx = -1;
+  if (q.length < 1) { ac.classList.remove('open'); return; }
+
+  acItems = COUNTRIES.filter(c => c.name.toLowerCase().includes(q)).slice(0, 10);
+  if (!acItems.length) { ac.classList.remove('open'); return; }
+
+  acItems.forEach((c, i) => {
+    const div = document.createElement('div');
+    div.className = 'ac-item';
+    div.innerHTML = `<span class="ac-name">${c.name}</span><span class="ac-reg">${c.who}</span>`;
+    div.addEventListener('mousedown', (e) => { e.preventDefault(); selectCountry(c); });
+    ac.appendChild(div);
+  });
+  ac.classList.add('open');
+});
+
+input.addEventListener('keydown', (e) => {
+  const items = ac.querySelectorAll('.ac-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    acIdx = Math.min(acIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === acIdx));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    acIdx = Math.max(acIdx - 1, -1);
+    items.forEach((el, i) => el.classList.toggle('active', i === acIdx));
+  } else if (e.key === 'Enter') {
+    if (acIdx >= 0 && acItems[acIdx]) selectCountry(acItems[acIdx]);
+    else {
+      const q = input.value.trim().toLowerCase();
+      const match = INDEX[q] || acItems[0];
+      if (match) selectCountry(match);
+    }
+  } else if (e.key === 'Escape') {
+    ac.classList.remove('open');
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-wrap')) ac.classList.remove('open');
+});
+
+function selectCountry(c) {
+  input.value = c.name;
+  ac.classList.remove('open');
+  showResult(c);
+  highlightMapCountry(c.name);
+}
+
+// ── MAP ──
+const map = L.map('map', {
+  center: [20, 15],
+  zoom: 2,
+  zoomControl: true,
+  attributionControl: true,
+  minZoom: 1,
+  maxZoom: 6,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  opacity: 1,
+}).addTo(map);
+
+let geojsonLayer = null;
+let selectedLayer = null;
+
+function getMapColor(status) {
+  if (status === 'green')  return { fill: '#1a4a2a', stroke: '#2d7d4a' };
+  if (status === 'yellow') return { fill: '#3a2a08', stroke: '#c0800a' };
+  if (status === 'red')    return { fill: '#3a0f0f', stroke: '#a03030' };
+  return { fill: '#1a2a1a', stroke: '#2a3d2a' };
+}
+
+function getDefaultStyle(feature) {
+  const cname = feature.properties.name || feature.properties.NAME || '';
+  const c = findCountryByMapName(cname);
+  if (!c) return { fillColor: '#141f14', color: '#2a3d2a', weight: 0.8, fillOpacity: 0.85, opacity: 1 };
+  const col = getMapColor(c.status);
+  return { fillColor: col.fill, color: col.stroke, weight: 1, fillOpacity: 0.85, opacity: 1 };
+}
+
+function findCountryByMapName(mapName) {
+  if (!mapName) return null;
+  const key = mapName.toLowerCase();
+  // Direct match
+  if (INDEX[key]) return INDEX[key];
+  // Fuzzy
+  const found = COUNTRIES.find(c =>
+    c.name.toLowerCase() === key ||
+    key.includes(c.name.toLowerCase()) ||
+    c.name.toLowerCase().includes(key)
+  );
+  return found || null;
+}
+
+// Load GeoJSON world data
+fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+  .then(r => r.json())
+  .then(data => {
+    geojsonLayer = L.geoJSON(data, {
+      style: getDefaultStyle,
+      onEachFeature: (feature, layer) => {
+        const cname = feature.properties.ADMIN || feature.properties.name || '';
+        layer.on({
+          mouseover: (e) => {
+            const l = e.target;
+            const c = findCountryByMapName(cname);
+            l.setStyle({ weight: 2, fillOpacity: 0.95 });
+            l.bringToFront();
+            const status = c ? (c.status==='green'?'NO PROPHYLAXIS':c.status==='yellow'?'AREA-SPECIFIC':'PROPHYLAXIS REQ.') : 'NOT ENDEMIC';
+            l.bindTooltip(`<div class="map-tooltip">${cname || 'Unknown'} — ${status}</div>`, { sticky: true, className: '' }).openTooltip();
+          },
+          mouseout: (e) => {
+            if (e.target !== selectedLayer) geojsonLayer.resetStyle(e.target);
+            e.target.closeTooltip();
+          },
+          click: (e) => {
+            const c = findCountryByMapName(cname);
+            if (c) {
+              if (selectedLayer) geojsonLayer.resetStyle(selectedLayer);
+              selectedLayer = e.target;
+              e.target.setStyle({ weight: 2.5, color: '#8ec88e', fillOpacity: 0.95 });
+              selectCountry(c);
+            }
+          }
+        });
+      }
+    }).addTo(map);
+  })
+  .catch(() => {
+    // Fail silently — search still works
+    console.log('Map data unavailable; search still functional.');
+  });
+
+function highlightMapCountry(name) {
+  if (!geojsonLayer) return;
+  geojsonLayer.eachLayer(layer => {
+    const fn = layer.feature?.properties?.ADMIN || layer.feature?.properties?.name || '';
+    const c = findCountryByMapName(fn);
+    if (c && c.name === name) {
+      if (selectedLayer) geojsonLayer.resetStyle(selectedLayer);
+      selectedLayer = layer;
+      layer.setStyle({ weight: 2.5, color: '#8ec88e', fillOpacity: 0.95 });
+      map.fitBounds(layer.getBounds(), { padding: [40, 40], maxZoom: 5 });
+    }
+  });
+}
+
+// ── MODAL ──
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+function closeModalIfBg(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+</script>
+
+<!-- FLIGHT SURGEON MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalIfBg(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">JBLM Flight Surgeon</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-surgeon-name">Flight Surgeon</div>
+      <div class="modal-surgeon-unit">JBLM · Joint Base Lewis-McChord, Washington</div>
+
+      <div class="modal-info-row">
+        <span class="modal-info-icon">📞</span>
+        <div class="modal-info-content">
+          <span class="modal-info-label">Commercial Line</span>
+          <span class="modal-info-value">253-279-8460</span>
+        </div>
+      </div>
+      <div class="modal-info-row">
+        <span class="modal-info-icon">📍</span>
+        <div class="modal-info-content">
+          <span class="modal-info-label">Installation</span>
+          <span class="modal-info-value">Joint Base Lewis-McChord, WA</span>
+        </div>
+      </div>
+      <div class="modal-info-row">
+        <span class="modal-info-icon">✈️</span>
+        <div class="modal-info-content">
+          <span class="modal-info-label">Unit</span>
+          <span class="modal-info-value">C-17 Aircrew Medicine</span>
+        </div>
+      </div>
+
+      <a class="modal-call-btn" href="tel:2532798460">📞 &nbsp; Call 253-279-8460</a>
+
+      <div class="modal-disclaimer">
+        Contact the flight surgeon prior to any mission requiring malaria chemoprophylaxis.<br>
+        Final recommendation depends on individual medical history and exact itinerary.
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
