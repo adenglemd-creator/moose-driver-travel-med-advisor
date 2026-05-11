@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Moose Driver — Travel Med Advisor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -10,38 +10,52 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 /* ─────────────────────────────────────────────
-   DESIGN: Military minimalist. Deep forest
-   greens, slate, off-white. Oswald for headings
-   (military stencil energy), Source Sans for
-   body. Moose silhouette SVG mark. Cascades
-   ridge-line as a subtle background element.
-   Clean, mission-brief aesthetic.
+   DESIGN: Professional military. White base with
+   forest green accents. Clean, bright, readable.
+   Oswald headings, Source Sans body text.
 ───────────────────────────────────────────── */
 
 :root {
-  --forest:    #243d24;
-  --forest2:   #2e4e2e;
-  --forest3:   #3a603a;
-  --slate:     #18262e;
-  --slate2:    #1f3040;
-  --slate3:    #273c4e;
-  --border:    #3d5e3d;
-  --border2:   #2a4258;
-  --sage:      #6aaa6a;
-  --sage-light:#88cc88;
-  --moss:      #5a965a;
-  --khaki:     #ddd0a0;
-  --khaki-dim: #8a7a4a;
-  --white:     #f0f5f0;
-  --offwhite:  #d8e4d8;
-  --muted:     #9ab89a;
-  --faint:     #5a7a5a;
-  --green-ok:  #3aaa60;
-  --green-bg:  #122a1c;
-  --amber:     #f0a020;
-  --amber-bg:  #261a06;
-  --red:       #d04040;
-  --red-bg:    #2a0e0e;
+  /* Surfaces */
+  --bg:        #f4f7f4;
+  --surface:   #ffffff;
+  --surface2:  #f0f5f0;
+  --surface3:  #e8f0e8;
+  /* Greens */
+  --green-dk:  #1f5c2e;
+  --green-md:  #2e7d40;
+  --green-lt:  #3da054;
+  --green-pale:#d4edda;
+  --green-xlt: #eaf5ec;
+  /* Borders */
+  --border:    #c0d8c4;
+  --border2:   #a8ccb0;
+  /* Text */
+  --ink:       #1a2e1e;
+  --ink2:      #2e4a34;
+  --muted:     #5a7a60;
+  --faint:     #8aaa90;
+  /* Status colours */
+  --green-ok:  #1e8040;
+  --green-bg:  #e8f5ec;
+  --amber:     #c07800;
+  --amber-bg:  #fff8e6;
+  --amber-bdr: #f0c060;
+  --red:       #c03030;
+  --red-bg:    #fdecea;
+  --red-bdr:   #e08080;
+  /* Aliases for backward compat */
+  --forest:    #ffffff;
+  --forest2:   #f0f5f0;
+  --forest3:   #e8f0e8;
+  --slate:     #f4f7f4;
+  --slate2:    #eaf2ea;
+  --slate3:    #e0ece0;
+  --sage:      #2e7d40;
+  --sage-light:#3da054;
+  --white:     #1a2e1e;
+  --offwhite:  #2e4a34;
+  --khaki:     #5a7a60;
   --mono:      'Share Tech Mono', monospace;
   --head:      'Oswald', sans-serif;
   --body:      'Source Sans 3', sans-serif;
@@ -51,10 +65,10 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--slate);
-  color: var(--white);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--body);
-  font-weight: 300;
+  font-weight: 400;
   min-height: 100vh;
   overflow: hidden;
 }
@@ -64,8 +78,8 @@ body::before {
   content: '';
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 220px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220' preserveAspectRatio='none'%3E%3Cpath d='M0,220 L0,160 L60,130 L120,145 L180,100 L240,115 L300,70 L360,90 L420,55 L480,75 L520,40 L560,60 L600,30 L640,50 L680,20 L720,45 L760,25 L800,55 L840,35 L880,65 L920,42 L960,70 L1020,50 L1080,80 L1140,60 L1200,90 L1260,70 L1320,100 L1380,80 L1440,110 L1440,220 Z' fill='%23243d24' opacity='0.8'/%3E%3Cpath d='M0,220 L0,185 L80,165 L160,175 L240,145 L320,158 L400,130 L460,142 L520,118 L580,132 L640,108 L700,122 L760,100 L820,115 L880,98 L940,112 L1000,95 L1080,110 L1160,98 L1240,115 L1320,105 L1440,120 L1440,220 Z' fill='%232e4e2e' opacity='0.95'/%3E%3C/svg%3E") no-repeat bottom center;
+  height: 180px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 180' preserveAspectRatio='none'%3E%3Cpath d='M0,180 L0,130 L60,105 L120,118 L180,82 L240,95 L300,58 L360,74 L420,44 L480,62 L520,32 L560,50 L600,24 L640,40 L680,16 L720,38 L760,20 L800,45 L840,28 L880,54 L920,34 L960,58 L1020,40 L1080,65 L1140,48 L1200,74 L1260,56 L1320,82 L1380,65 L1440,90 L1440,180 Z' fill='%232e7d40' opacity='0.12'/%3E%3Cpath d='M0,180 L0,150 L80,135 L160,143 L240,118 L320,130 L400,106 L460,116 L520,96 L580,108 L640,88 L700,100 L760,82 L820,94 L880,80 L940,92 L1000,78 L1080,90 L1160,80 L1240,94 L1320,86 L1440,98 L1440,180 Z' fill='%231f5c2e' opacity='0.09'/%3E%3C/svg%3E") no-repeat bottom center;
   background-size: 100% 100%;
   pointer-events: none;
   z-index: 0;
@@ -74,29 +88,21 @@ body::before {
 /* ── HEADER ── */
 header {
   position: sticky; top: 0; z-index: 1000;
-  background: var(--forest);
-  border-bottom: 1px solid var(--border);
+  background: var(--green-dk);
+  border-bottom: 2px solid var(--green-md);
   height: 58px;
   display: flex;
   align-items: center;
   padding: 0 24px;
-  gap: 20px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.5);
+  gap: 16px;
+  box-shadow: 0 2px 12px rgba(30,80,40,0.2);
 }
 
 /* Moose silhouette mark */
 .moose-mark {
   width: 42px; height: 42px;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 8px rgba(106,170,106,0.5));
-}
-
-/* C-17 silhouette in header */
-.c17-mark {
-  width: 120px; height: 45px;
-  flex-shrink: 0;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 6px rgba(106,170,106,0.3));
+  filter: brightness(0) invert(1) opacity(0.92);
 }
 
 .header-title {
@@ -109,13 +115,13 @@ header {
   font-size: 17px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--white);
+  color: #ffffff;
   line-height: 1;
 }
 .header-sub {
   font-family: var(--mono);
   font-size: 9px;
-  color: var(--sage);
+  color: #a8d8b0;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
@@ -129,16 +135,16 @@ header {
 .meta-tag {
   font-family: var(--mono);
   font-size: 9px;
-  color: var(--muted);
+  color: #a8d8b0;
   letter-spacing: 0.1em;
   text-align: right;
   line-height: 1.7;
 }
 
 .hdr-btn {
-  background: transparent;
-  border: 1px solid var(--sage);
-  color: var(--sage-light);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.5);
+  color: #ffffff;
   font-family: var(--head);
   font-weight: 500;
   font-size: 11px;
@@ -147,12 +153,11 @@ header {
   padding: 6px 14px;
   border-radius: 2px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s;
   white-space: nowrap;
 }
 .hdr-btn:hover {
-  background: var(--sage);
-  color: var(--white);
+  background: rgba(255,255,255,0.28);
 }
 
 /* ── MAIN LAYOUT ── */
@@ -165,7 +170,7 @@ header {
 
 /* ── LEFT PANEL ── */
 .panel {
-  background: var(--forest);
+  background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -174,8 +179,9 @@ header {
 
 /* Search */
 .search-box {
-  padding: 18px;
+  padding: 16px 18px;
   border-bottom: 1px solid var(--border);
+  background: var(--green-xlt);
 }
 
 .section-tag {
@@ -183,7 +189,7 @@ header {
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--sage);
+  color: var(--green-md);
   margin-bottom: 9px;
   display: flex;
   align-items: center;
@@ -200,10 +206,10 @@ header {
 
 .search-input {
   width: 100%;
-  background: var(--slate2);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
-  color: var(--white);
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 4px;
+  color: var(--ink);
   font-family: var(--mono);
   font-size: 14px;
   padding: 10px 38px 10px 13px;
@@ -213,15 +219,15 @@ header {
 }
 .search-input::placeholder { color: var(--faint); }
 .search-input:focus {
-  border-color: var(--sage);
-  box-shadow: 0 0 0 3px rgba(74,124,74,0.15);
+  border-color: var(--green-md);
+  box-shadow: 0 0 0 3px rgba(46,125,64,0.12);
 }
 
 .search-icon {
   position: absolute;
   right: 11px; top: 50%;
   transform: translateY(-50%);
-  color: var(--faint);
+  color: var(--green-md);
   font-size: 15px;
   pointer-events: none;
   font-style: normal;
@@ -231,30 +237,30 @@ header {
 .autocomplete {
   position: absolute;
   top: calc(100% + 3px); left: 0; right: 0;
-  background: var(--slate2);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
+  background: var(--surface);
+  border: 1.5px solid var(--green-md);
+  border-radius: 4px;
   max-height: 200px;
   overflow-y: auto;
   z-index: 500;
   display: none;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 20px rgba(30,80,40,0.15);
 }
 .autocomplete.open { display: block; }
 .ac-item {
-  padding: 8px 13px;
+  padding: 9px 13px;
   font-family: var(--mono);
   font-size: 12px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
   transition: background 0.1s;
 }
 .ac-item:last-child { border-bottom: none; }
-.ac-item:hover, .ac-item.active { background: var(--forest3); }
-.ac-name { color: var(--white); }
+.ac-item:hover, .ac-item.active { background: var(--green-xlt); }
+.ac-name { color: var(--ink); }
 .ac-reg  { color: var(--muted); font-size: 10px; }
 
 /* Result area */
@@ -262,8 +268,9 @@ header {
   flex: 1;
   overflow-y: auto;
   padding: 18px;
+  background: var(--surface2);
   scrollbar-width: thin;
-  scrollbar-color: var(--faint) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
 /* Placeholder */
@@ -276,7 +283,7 @@ header {
   gap: 14px;
   text-align: center;
 }
-.ph-moose { font-size: 56px; opacity: 0.12; line-height: 1; }
+.ph-moose { font-size: 56px; opacity: 0.25; line-height: 1; }
 .ph-text {
   font-family: var(--mono);
   font-size: 10px;
@@ -296,14 +303,15 @@ header {
 
 /* Verdict banner */
 .verdict {
-  border-radius: 2px;
+  border-radius: 6px;
   padding: 15px 16px;
   margin-bottom: 14px;
-  border-left: 3px solid;
+  border-left: 4px solid;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.verdict-green  { background: var(--green-bg); border-color: var(--green-ok); }
-.verdict-yellow { background: var(--amber-bg); border-color: var(--amber); }
-.verdict-red    { background: var(--red-bg);   border-color: var(--red); }
+.verdict-green  { background: var(--green-bg);  border-color: var(--green-ok); }
+.verdict-yellow { background: var(--amber-bg);  border-color: var(--amber); }
+.verdict-red    { background: var(--red-bg);    border-color: var(--red); }
 
 .v-top {
   display: flex;
@@ -318,7 +326,7 @@ header {
   font-size: 22px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--white);
+  color: var(--ink);
   line-height: 1.1;
 }
 .v-region-who {
@@ -336,29 +344,31 @@ header {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.verdict-green  .v-status { color: #5ecc85; }
-.verdict-yellow .v-status { color: #e0a030; }
-.verdict-red    .v-status { color: #d46060; }
+.verdict-green  .v-status { color: var(--green-ok); }
+.verdict-yellow .v-status { color: var(--amber); }
+.verdict-red    .v-status { color: var(--red); }
 
 /* Info blocks */
 .info-block {
-  background: var(--slate2);
-  border: 1px solid var(--border2);
-  border-radius: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
   margin-bottom: 10px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .ib-head {
-  padding: 6px 12px;
-  background: rgba(255,255,255,0.03);
+  padding: 7px 12px;
+  background: var(--green-xlt);
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--sage);
-  border-bottom: 1px solid var(--border2);
+  color: var(--green-dk);
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
 }
-.ib-body { padding: 11px 12px; }
+.ib-body { padding: 12px; }
 
 .info-row {
   display: flex;
@@ -378,7 +388,7 @@ header {
   padding-top: 2px;
   flex-shrink: 0;
 }
-.ir-val { color: var(--white); flex: 1; line-height: 1.5; }
+.ir-val { color: var(--ink); flex: 1; line-height: 1.5; }
 
 /* Chips */
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -391,18 +401,18 @@ header {
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
-.chip-drug   { background: rgba(94,158,94,0.12); color: #8ec88e; border: 1px solid rgba(94,158,94,0.2); }
-.chip-resist { background: rgba(180,60,60,0.1);  color: #d48080; border: 1px solid rgba(180,60,60,0.2); }
-.chip-pv     { background: rgba(74,124,74,0.12); color: #7abf7a; border: 1px solid rgba(74,124,74,0.2); }
-.chip-note   { background: rgba(200,185,138,0.1); color: var(--khaki); border: 1px solid rgba(200,185,138,0.15); }
+.chip-drug   { background: #e8f5ec; color: #1a6630; border: 1px solid #b0d8bc; }
+.chip-resist { background: #fdecea; color: #b02020; border: 1px solid #f0b0b0; }
+.chip-pv     { background: #e8f5ec; color: #1f5c2e; border: 1px solid #a8d4b0; }
+.chip-note   { background: #fff8e6; color: #8a5a00; border: 1px solid #f0d890; }
 
 /* Region list */
 .region-list { list-style: none; }
 .region-list li {
-  padding: 5px 0;
+  padding: 6px 0;
   font-size: 12px;
-  color: var(--white);
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--ink);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -418,10 +428,10 @@ header {
 
 /* Flight surgeon card */
 .surgeon-card {
-  background: linear-gradient(160deg, var(--green-bg), var(--forest));
-  border: 1px solid rgba(74,124,74,0.35);
-  border-radius: 2px;
-  padding: 13px;
+  background: var(--green-xlt);
+  border: 1.5px solid var(--green-md);
+  border-radius: 8px;
+  padding: 14px;
   margin-top: 10px;
 }
 .sc-label {
@@ -429,57 +439,57 @@ header {
   font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--sage-light);
+  color: var(--green-dk);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 600;
 }
-.sc-label::after { content:''; flex:1; height:1px; background: rgba(74,124,74,0.25); }
+.sc-label::after { content:''; flex:1; height:1px; background: var(--border2); }
 .sc-name {
   font-family: var(--head);
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--white);
+  color: var(--ink);
   margin-bottom: 1px;
 }
 .sc-unit {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--muted);
   margin-bottom: 10px;
   font-family: var(--mono);
   letter-spacing: 0.06em;
-  font-size: 10px;
 }
 .call-btn {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(45,125,74,0.2);
-  border: 1px solid var(--green-ok);
-  border-radius: 2px;
-  padding: 10px 13px;
+  background: var(--green-dk);
+  border: none;
+  border-radius: 6px;
+  padding: 11px 14px;
   text-decoration: none;
   transition: background 0.15s;
   cursor: pointer;
   width: 100%;
 }
-.call-btn:hover { background: rgba(45,125,74,0.35); }
+.call-btn:hover { background: var(--green-md); }
 .call-icon { font-size: 20px; }
 .call-info { display: flex; flex-direction: column; gap: 1px; }
 .call-label {
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: 0.16em;
-  color: var(--sage-light);
+  color: #a8d8b0;
   text-transform: uppercase;
 }
 .call-number {
   font-family: var(--mono);
   font-size: 17px;
-  color: var(--white);
+  color: #ffffff;
   letter-spacing: 0.08em;
 }
 
@@ -487,11 +497,11 @@ header {
 .disclaimer {
   margin-top: 10px;
   padding: 9px 11px;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 2px;
+  background: #fffbea;
+  border: 1px solid #e8d880;
+  border-radius: 4px;
   font-size: 9.5px;
-  color: var(--muted);
+  color: #7a6000;
   line-height: 1.6;
   font-family: var(--mono);
   letter-spacing: 0.03em;
@@ -503,33 +513,23 @@ header {
   overflow: hidden;
 }
 
-/* C-17 watermark overlaid on map */
-.map-c17-watermark {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  max-width: 600px;
-  pointer-events: none;
-  z-index: 450;
-}
+
 
 #map {
   width: 100%;
   height: 100%;
 }
 
-.leaflet-container { background: #182818 !important; }
-.leaflet-tile-pane { filter: brightness(0.6) saturate(0.4) hue-rotate(80deg) contrast(1.05); }
+.leaflet-container { background: #e8f0e8 !important; }
+.leaflet-tile-pane { filter: brightness(0.85) saturate(0.5) hue-rotate(40deg); }
 .leaflet-control-zoom a {
-  background: var(--forest2) !important;
-  color: var(--offwhite) !important;
+  background: var(--surface) !important;
+  color: var(--green-dk) !important;
   border-color: var(--border) !important;
 }
 .leaflet-control-attribution {
-  background: rgba(15,26,15,0.8) !important;
-  color: var(--faint) !important;
+  background: rgba(255,255,255,0.85) !important;
+  color: var(--muted) !important;
   font-size: 9px !important;
 }
 
@@ -540,25 +540,26 @@ header {
   font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--sage);
-  background: rgba(26,46,26,0.85);
-  border: 1px solid var(--border);
+  color: var(--green-dk);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--border2);
   padding: 5px 10px;
-  border-radius: 2px;
+  border-radius: 4px;
   pointer-events: none;
   z-index: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* Map tooltip */
 .map-tooltip {
-  background: var(--forest2);
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
   padding: 5px 10px;
   font-family: var(--mono);
   font-size: 11px;
-  color: var(--white);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  color: var(--ink);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -579,12 +580,12 @@ header {
 .modal-overlay.open { opacity: 1; pointer-events: all; }
 
 .modal {
-  background: var(--forest);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 10px;
   width: 420px;
   max-width: 94vw;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+  box-shadow: 0 16px 48px rgba(30,80,40,0.18);
   transform: translateY(12px);
   transition: transform 0.2s;
   overflow: hidden;
@@ -592,8 +593,8 @@ header {
 .modal-overlay.open .modal { transform: translateY(0); }
 
 .modal-head {
-  background: var(--forest2);
-  border-bottom: 1px solid var(--border);
+  background: var(--green-dk);
+  border-bottom: none;
   padding: 14px 18px;
   display: flex;
   align-items: center;
@@ -605,16 +606,16 @@ header {
   font-size: 14px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--white);
+  color: #ffffff;
 }
 .modal-close {
   background: none; border: none;
-  color: var(--muted); font-size: 20px;
+  color: rgba(255,255,255,0.6); font-size: 20px;
   cursor: pointer; line-height: 1;
   padding: 0 4px;
   transition: color 0.1s;
 }
-.modal-close:hover { color: var(--white); }
+.modal-close:hover { color: #ffffff; }
 
 .modal-body { padding: 20px 18px; }
 
@@ -624,7 +625,7 @@ header {
   font-size: 18px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--white);
+  color: var(--ink);
   margin-bottom: 2px;
 }
 .modal-surgeon-unit {
@@ -650,21 +651,21 @@ header {
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--sage);
+  color: var(--green-md);
 }
 .modal-info-value {
   font-family: var(--mono);
   font-size: 15px;
-  color: var(--white);
+  color: var(--ink);
   letter-spacing: 0.06em;
 }
 
 .modal-call-btn {
   display: block;
   margin-top: 18px;
-  background: rgba(45,125,74,0.2);
-  border: 1px solid var(--green-ok);
-  border-radius: 2px;
+  background: var(--green-dk);
+  border: none;
+  border-radius: 6px;
   padding: 13px 18px;
   text-decoration: none;
   text-align: center;
@@ -673,11 +674,11 @@ header {
   font-size: 15px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--white);
+  color: #ffffff;
   transition: background 0.15s;
   cursor: pointer;
 }
-.modal-call-btn:hover { background: rgba(45,125,74,0.4); }
+.modal-call-btn:hover { background: var(--green-md); }
 
 .modal-disclaimer {
   margin-top: 14px;
@@ -689,12 +690,88 @@ header {
   text-align: center;
 }
 
-/* Responsive tweaks */
-@media (max-width: 760px) {
-  .layout { grid-template-columns: 1fr; }
-  .map-side { display: none; }
-  body { overflow: auto; }
-  .panel { height: calc(100vh - 58px); }
+/* ══════════════════════════════════════════
+   RESPONSIVE — TABLET & MOBILE
+══════════════════════════════════════════ */
+
+/* ── TABLET (641–900px) ── */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 320px 1fr; }
+  .meta-tag { display: none; }
+}
+
+/* ── MOBILE (≤640px) ── */
+@media (max-width: 640px) {
+
+  body { overflow-x: hidden; overflow-y: auto; }
+
+  /* Compact header */
+  header { height: 52px; padding: 0 14px; gap: 10px; }
+  .moose-mark  { width: 32px; height: 32px; }
+  .header-name { font-size: 15px; letter-spacing: 0.08em; }
+  .header-sub  { font-size: 8px; }
+  .meta-tag    { display: none; }
+  .hdr-btn     { font-size: 10px; padding: 5px 10px; }
+
+  /* Stack layout vertically */
+  .layout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 52px);
+  }
+
+  /* Panel: full width, content height */
+  .panel {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    overflow: visible;
+  }
+
+  /* Search */
+  .search-box   { padding: 14px; }
+  .search-input { font-size: 16px; } /* prevents iOS auto-zoom on focus */
+  .autocomplete { max-height: 180px; }
+
+  /* Results scroll naturally */
+  .result-area  { flex: none; overflow-y: visible; padding: 14px; max-height: none; }
+  .placeholder  { padding: 24px 0; height: auto; }
+  .ph-moose     { font-size: 40px; }
+
+  /* Verdict */
+  .verdict   { padding: 12px 14px; }
+  .v-country { font-size: 20px; }
+
+  /* Info rows stack */
+  .info-row  { flex-direction: column; gap: 4px; }
+  .ir-label  { min-width: unset; }
+  .chips     { gap: 4px; }
+  .chip      { font-size: 9px; padding: 2px 6px; }
+
+  /* Surgeon card — big tap target */
+  .call-btn    { padding: 13px 14px; }
+  .call-number { font-size: 20px; }
+
+  /* Disclaimer */
+  .disclaimer { font-size: 9px; padding: 8px 10px; }
+
+  /* Region list */
+  .region-list li { font-size: 12px; padding: 6px 0; }
+
+  /* Map shown below results */
+  .map-side {
+    display: block;
+    width: 100%;
+    height: 300px;
+    flex-shrink: 0;
+  }
+  .map-overlay-label  { font-size: 8px; padding: 4px 8px; }
+
+  /* Modal */
+  .modal          { width: 95vw; }
+  .modal-call-btn { font-size: 14px; padding: 13px; }
 }
 </style>
 </head>
@@ -743,41 +820,6 @@ header {
       <!-- Tail -->
       <ellipse cx="88" cy="63" rx="4" ry="5"/>
     </g>
-  </svg>
-
-  <!-- C-17 silhouette (inline SVG, side profile) -->
-  <svg class="c17-mark" viewBox="0 0 160 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <!-- Fuselage - wide body transport -->
-    <path d="M15,28 Q20,22 35,22 L130,22 Q140,22 145,26 Q148,28 145,30 Q140,32 130,32 L35,32 Q20,32 15,28 Z" fill="#6aaa6a"/>
-    <!-- Nose cone -->
-    <path d="M10,28 Q8,25 15,24 L15,32 Q8,31 10,28 Z" fill="#6aaa6a"/>
-    <!-- Tail fin (vertical stabilizer) -->
-    <path d="M128,22 L135,4 L142,4 L138,22 Z" fill="#6aaa6a"/>
-    <!-- Horizontal stabilizers -->
-    <path d="M125,25 L125,22 L155,18 L155,20 Z" fill="#6aaa6a"/>
-    <path d="M125,29 L125,32 L155,36 L155,34 Z" fill="#6aaa6a"/>
-    <!-- Main wing (high-wing transport) -->
-    <path d="M55,22 L52,2 L62,2 L68,22 Z" fill="#7acc7a"/>
-    <path d="M68,22 L75,2 L82,2 L80,22 Z" fill="#7acc7a"/>
-    <path d="M80,22 L90,2 L95,2 L88,22 Z" fill="#7acc7a"/>
-    <!-- Engine pods (4 engines) -->
-    <rect x="54" y="14" width="14" height="5" rx="2.5" fill="#4a8a4a"/>
-    <rect x="70" y="10" width="14" height="5" rx="2.5" fill="#4a8a4a"/>
-    <rect x="83" y="7" width="13" height="5" rx="2.5" fill="#4a8a4a"/>
-    <!-- Winglets hint -->
-    <path d="M90,2 L96,0 L97,3 L91,4 Z" fill="#5e9e5e"/>
-    <!-- Rear cargo ramp area -->
-    <path d="M130,32 L135,36 L128,36 L128,32 Z" fill="#4a8a4a"/>
-    <!-- Windows row -->
-    <rect x="25" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
-    <rect x="32" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
-    <rect x="39" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
-    <rect x="46" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
-    <!-- Nose gear -->
-    <line x1="22" y1="32" x2="22" y2="38" stroke="#4a8a4a" stroke-width="1.5"/>
-    <!-- Main gear -->
-    <line x1="72" y1="32" x2="72" y2="40" stroke="#4a8a4a" stroke-width="2"/>
-    <line x1="78" y1="32" x2="78" y2="40" stroke="#4a8a4a" stroke-width="2"/>
   </svg>
 
   <div class="header-title">
@@ -891,30 +933,6 @@ header {
   <!-- MAP SIDE -->
   <div class="map-side">
     <div class="map-overlay-label">CLICK COUNTRY TO LOOK UP</div>
-    <!-- C-17 watermark on map -->
-    <svg class="map-c17-watermark" viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <!-- Fuselage -->
-      <path d="M40,90 Q60,68 110,68 L400,68 Q430,68 445,78 Q455,88 445,98 Q430,108 400,108 L110,108 Q60,108 40,90 Z" fill="white" opacity="0.06"/>
-      <!-- Nose -->
-      <path d="M28,90 Q22,80 40,75 L40,105 Q22,100 28,90 Z" fill="white" opacity="0.06"/>
-      <!-- Vertical stabilizer -->
-      <path d="M390,68 L410,10 L435,10 L425,68 Z" fill="white" opacity="0.06"/>
-      <!-- Horizontal stabs -->
-      <path d="M388,78 L388,68 L490,52 L490,58 Z" fill="white" opacity="0.06"/>
-      <path d="M388,98 L388,108 L490,124 L490,118 Z" fill="white" opacity="0.06"/>
-      <!-- Main wings -->
-      <path d="M160,68 L150,4 L185,4 L205,68 Z" fill="white" opacity="0.06"/>
-      <path d="M205,68 L220,4 L255,4 L248,68 Z" fill="white" opacity="0.06"/>
-      <path d="M248,68 L268,4 L295,4 L278,68 Z" fill="white" opacity="0.06"/>
-      <!-- Engine pods -->
-      <rect x="158" y="42" width="44" height="16" rx="8" fill="white" opacity="0.05"/>
-      <rect x="208" y="28" width="44" height="16" rx="8" fill="white" opacity="0.05"/>
-      <rect x="252" y="18" width="40" height="16" rx="8" fill="white" opacity="0.05"/>
-      <!-- Winglet -->
-      <path d="M278,4 L298,0 L300,8 L282,12 Z" fill="white" opacity="0.05"/>
-      <!-- Cargo ramp -->
-      <path d="M400,108 L414,120 L398,120 L398,108 Z" fill="white" opacity="0.05"/>
-    </svg>
     <div id="map"></div>
   </div>
 
@@ -1286,16 +1304,16 @@ let geojsonLayer = null;
 let selectedLayer = null;
 
 function getMapColor(status) {
-  if (status === 'green')  return { fill: '#2a6e3a', stroke: '#4acc70' };
-  if (status === 'yellow') return { fill: '#5a3c08', stroke: '#f0a020' };
-  if (status === 'red')    return { fill: '#5a1818', stroke: '#d05050' };
+  if (status === 'green')  return { fill: '#b8e8c4', stroke: '#3aaa60' };
+  if (status === 'yellow') return { fill: '#ffe4a0', stroke: '#c07800' };
+  if (status === 'red')    return { fill: '#f4b8b8', stroke: '#c03030' };
   return { fill: '#1e3220', stroke: '#3a5e3a' };
 }
 
 function getDefaultStyle(feature) {
   const cname = feature.properties.ADMIN || feature.properties.name || feature.properties.NAME || '';
   const c = findCountryByMapName(cname);
-  if (!c) return { fillColor: '#1e3a20', color: '#3a5e3a', weight: 0.8, fillOpacity: 0.85, opacity: 1 };
+  if (!c) return { fillColor: '#ddeedd', color: '#a0c8a8', weight: 0.8, fillOpacity: 0.85, opacity: 1 };
   const col = getMapColor(c.status);
   return { fillColor: col.fill, color: col.stroke, weight: 1, fillOpacity: 0.85, opacity: 1 };
 }
@@ -1358,7 +1376,7 @@ function buildGeoLayer(data) {
 // Show a loading message on the map while GeoJSON loads
 const mapMsg = document.createElement('div');
 mapMsg.id = 'mapStatusMsg';
-mapMsg.style.cssText = 'position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:900;background:rgba(26,46,26,0.9);border:1px solid #2d3f2d;padding:6px 14px;font-family:var(--mono);font-size:10px;color:#7a8f7a;letter-spacing:0.12em;border-radius:2px;pointer-events:none;';
+mapMsg.style.cssText = 'position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:900;background:rgba(255,255,255,0.92);border:1px solid #c0d8c4;padding:6px 14px;font-family:var(--mono);font-size:10px;color:#2e7d40;letter-spacing:0.12em;border-radius:4px;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,0.1);';
 mapMsg.textContent = 'LOADING MAP DATA…';
 document.querySelector('.map-side').appendChild(mapMsg);
 
@@ -1413,6 +1431,13 @@ function closeModalIfBg(e) {
   if (e.target === document.getElementById('modalOverlay')) closeModal();
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// ── MOBILE: force Leaflet to recalculate map size after layout reflow ──
+// On mobile the map panel height is set via CSS after the panel stacks,
+// so Leaflet needs a nudge to fill its container correctly.
+window.addEventListener('resize', () => { map.invalidateSize(); });
+// Also fire once on load after a short delay to catch the initial render
+setTimeout(() => { map.invalidateSize(); }, 300);
 </script>
 
 <!-- FLIGHT SURGEON MODAL -->
