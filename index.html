@@ -19,29 +19,29 @@
 ───────────────────────────────────────────── */
 
 :root {
-  --forest:    #1a2e1a;
-  --forest2:   #223022;
-  --forest3:   #2a3d2a;
-  --slate:     #0f1a1f;
-  --slate2:    #152028;
-  --slate3:    #1d2e38;
-  --border:    #2d3f2d;
-  --border2:   #1e3040;
-  --sage:      #4a7c4a;
-  --sage-light:#5e9e5e;
-  --moss:      #3d6b3d;
-  --khaki:     #c8b98a;
-  --khaki-dim: #6b5f3a;
-  --white:     #e8ede8;
-  --offwhite:  #c8d0c8;
-  --muted:     #7a8f7a;
-  --faint:     #3a4a3a;
-  --green-ok:  #2d7d4a;
-  --green-bg:  #0c1f12;
-  --amber:     #d4880a;
-  --amber-bg:  #1a1205;
-  --red:       #b03030;
-  --red-bg:    #1a0808;
+  --forest:    #243d24;
+  --forest2:   #2e4e2e;
+  --forest3:   #3a603a;
+  --slate:     #18262e;
+  --slate2:    #1f3040;
+  --slate3:    #273c4e;
+  --border:    #3d5e3d;
+  --border2:   #2a4258;
+  --sage:      #6aaa6a;
+  --sage-light:#88cc88;
+  --moss:      #5a965a;
+  --khaki:     #ddd0a0;
+  --khaki-dim: #8a7a4a;
+  --white:     #f0f5f0;
+  --offwhite:  #d8e4d8;
+  --muted:     #9ab89a;
+  --faint:     #5a7a5a;
+  --green-ok:  #3aaa60;
+  --green-bg:  #122a1c;
+  --amber:     #f0a020;
+  --amber-bg:  #261a06;
+  --red:       #d04040;
+  --red-bg:    #2a0e0e;
   --mono:      'Share Tech Mono', monospace;
   --head:      'Oswald', sans-serif;
   --body:      'Source Sans 3', sans-serif;
@@ -65,7 +65,7 @@ body::before {
   position: fixed;
   bottom: 0; left: 0; right: 0;
   height: 220px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220' preserveAspectRatio='none'%3E%3Cpath d='M0,220 L0,160 L60,130 L120,145 L180,100 L240,115 L300,70 L360,90 L420,55 L480,75 L520,40 L560,60 L600,30 L640,50 L680,20 L720,45 L760,25 L800,55 L840,35 L880,65 L920,42 L960,70 L1020,50 L1080,80 L1140,60 L1200,90 L1260,70 L1320,100 L1380,80 L1440,110 L1440,220 Z' fill='%23192819' opacity='0.7'/%3E%3Cpath d='M0,220 L0,185 L80,165 L160,175 L240,145 L320,158 L400,130 L460,142 L520,118 L580,132 L640,108 L700,122 L760,100 L820,115 L880,98 L940,112 L1000,95 L1080,110 L1160,98 L1240,115 L1320,105 L1440,120 L1440,220 Z' fill='%231a2a1a' opacity='0.9'/%3E%3C/svg%3E") no-repeat bottom center;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 220' preserveAspectRatio='none'%3E%3Cpath d='M0,220 L0,160 L60,130 L120,145 L180,100 L240,115 L300,70 L360,90 L420,55 L480,75 L520,40 L560,60 L600,30 L640,50 L680,20 L720,45 L760,25 L800,55 L840,35 L880,65 L920,42 L960,70 L1020,50 L1080,80 L1140,60 L1200,90 L1260,70 L1320,100 L1380,80 L1440,110 L1440,220 Z' fill='%23243d24' opacity='0.8'/%3E%3Cpath d='M0,220 L0,185 L80,165 L160,175 L240,145 L320,158 L400,130 L460,142 L520,118 L580,132 L640,108 L700,122 L760,100 L820,115 L880,98 L940,112 L1000,95 L1080,110 L1160,98 L1240,115 L1320,105 L1440,120 L1440,220 Z' fill='%232e4e2e' opacity='0.95'/%3E%3C/svg%3E") no-repeat bottom center;
   background-size: 100% 100%;
   pointer-events: none;
   z-index: 0;
@@ -84,11 +84,19 @@ header {
   box-shadow: 0 2px 16px rgba(0,0,0,0.5);
 }
 
-/* Moose SVG logo */
+/* Moose silhouette mark */
 .moose-mark {
-  width: 38px; height: 38px;
+  width: 42px; height: 42px;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 6px rgba(74,124,74,0.4));
+  filter: drop-shadow(0 0 8px rgba(106,170,106,0.5));
+}
+
+/* C-17 silhouette in header */
+.c17-mark {
+  width: 120px; height: 45px;
+  flex-shrink: 0;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 6px rgba(106,170,106,0.3));
 }
 
 .header-title {
@@ -495,13 +503,25 @@ header {
   overflow: hidden;
 }
 
+/* C-17 watermark overlaid on map */
+.map-c17-watermark {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  max-width: 600px;
+  pointer-events: none;
+  z-index: 450;
+}
+
 #map {
   width: 100%;
   height: 100%;
 }
 
-.leaflet-container { background: #0a1008 !important; }
-.leaflet-tile-pane { filter: brightness(0.45) saturate(0.3) hue-rotate(80deg) contrast(1.1); }
+.leaflet-container { background: #182818 !important; }
+.leaflet-tile-pane { filter: brightness(0.6) saturate(0.4) hue-rotate(80deg) contrast(1.05); }
 .leaflet-control-zoom a {
   background: var(--forest2) !important;
   color: var(--offwhite) !important;
@@ -682,30 +702,87 @@ header {
 
 <!-- ── HEADER ── -->
 <header>
-  <!-- Moose SVG mark -->
-  <svg class="moose-mark" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <!-- Antlers -->
-    <path d="M28 22 L18 8 L14 14 L20 18" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M18 8 L22 4 L24 10" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <path d="M28 22 L36 10 L32 6 L30 14" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <path d="M36 10 L40 6 L38 13" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <!-- Neck & head -->
-    <path d="M26 28 Q24 24 28 22 Q34 20 36 24 Q38 28 36 32 L34 36" stroke="#5e9e5e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <!-- Snout -->
-    <path d="M34 36 Q36 40 38 42 Q34 44 32 42 L30 38" stroke="#5e9e5e" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <!-- Body -->
-    <path d="M26 36 Q20 40 18 50 Q18 60 22 64 L24 72" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <path d="M34 36 Q42 40 44 50 Q44 60 40 64 L38 72" stroke="#4a7c4a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <!-- Front legs -->
-    <path d="M22 52 L20 68 L22 72" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <path d="M40 52 L42 68 L40 72" stroke="#4a7c4a" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <!-- Shoulder hump -->
-    <path d="M18 42 Q24 36 30 38 Q38 38 44 42" stroke="#5e9e5e" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Moose silhouette mark (solid filled) -->
+  <svg class="moose-mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="#7acc7a">
+      <!-- Left antler main beam -->
+      <polygon points="38,38 30,18 25,20 28,28 22,14 17,16 20,26 14,10 10,13 18,30 24,30"/>
+      <!-- Left antler tines -->
+      <polygon points="25,20 21,10 19,11 22,22"/>
+      <polygon points="22,14 18,6 16,8 19,16"/>
+      <!-- Right antler main beam -->
+      <polygon points="50,38 60,18 65,20 62,28 68,14 73,16 70,26 76,10 80,13 72,30 66,30"/>
+      <!-- Right antler tines -->
+      <polygon points="65,20 69,10 71,11 68,22"/>
+      <polygon points="68,14 72,6 74,8 71,16"/>
+      <!-- Head - large moose snout/nose shape -->
+      <ellipse cx="44" cy="36" rx="10" ry="8"/>
+      <!-- Snout extension (bulbous moose nose) -->
+      <ellipse cx="38" cy="42" rx="8" ry="6"/>
+      <!-- Eye -->
+      <circle cx="47" cy="33" r="1.5" fill="#18262e"/>
+      <!-- Neck -->
+      <polygon points="44,44 52,44 56,58 48,62 40,58"/>
+      <!-- Body - main torso, moose has large shoulder hump -->
+      <ellipse cx="62" cy="65" rx="20" ry="14"/>
+      <!-- Shoulder hump -->
+      <ellipse cx="50" cy="58" rx="14" ry="10"/>
+      <!-- Rump -->
+      <ellipse cx="78" cy="68" rx="12" ry="11"/>
+      <!-- Front left leg -->
+      <rect x="46" y="72" width="6" height="22" rx="2"/>
+      <!-- Front right leg -->
+      <rect x="56" y="74" width="6" height="20" rx="2"/>
+      <!-- Back left leg -->
+      <rect x="68" y="76" width="6" height="20" rx="2"/>
+      <!-- Back right leg -->
+      <rect x="76" y="75" width="6" height="21" rx="2"/>
+      <!-- Dewlap (throat flap) -->
+      <ellipse cx="41" cy="48" rx="5" ry="7"/>
+      <!-- Tail -->
+      <ellipse cx="88" cy="63" rx="4" ry="5"/>
+    </g>
+  </svg>
+
+  <!-- C-17 silhouette (inline SVG, side profile) -->
+  <svg class="c17-mark" viewBox="0 0 160 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <!-- Fuselage - wide body transport -->
+    <path d="M15,28 Q20,22 35,22 L130,22 Q140,22 145,26 Q148,28 145,30 Q140,32 130,32 L35,32 Q20,32 15,28 Z" fill="#6aaa6a"/>
+    <!-- Nose cone -->
+    <path d="M10,28 Q8,25 15,24 L15,32 Q8,31 10,28 Z" fill="#6aaa6a"/>
+    <!-- Tail fin (vertical stabilizer) -->
+    <path d="M128,22 L135,4 L142,4 L138,22 Z" fill="#6aaa6a"/>
+    <!-- Horizontal stabilizers -->
+    <path d="M125,25 L125,22 L155,18 L155,20 Z" fill="#6aaa6a"/>
+    <path d="M125,29 L125,32 L155,36 L155,34 Z" fill="#6aaa6a"/>
+    <!-- Main wing (high-wing transport) -->
+    <path d="M55,22 L52,2 L62,2 L68,22 Z" fill="#7acc7a"/>
+    <path d="M68,22 L75,2 L82,2 L80,22 Z" fill="#7acc7a"/>
+    <path d="M80,22 L90,2 L95,2 L88,22 Z" fill="#7acc7a"/>
+    <!-- Engine pods (4 engines) -->
+    <rect x="54" y="14" width="14" height="5" rx="2.5" fill="#4a8a4a"/>
+    <rect x="70" y="10" width="14" height="5" rx="2.5" fill="#4a8a4a"/>
+    <rect x="83" y="7" width="13" height="5" rx="2.5" fill="#4a8a4a"/>
+    <!-- Winglets hint -->
+    <path d="M90,2 L96,0 L97,3 L91,4 Z" fill="#5e9e5e"/>
+    <!-- Rear cargo ramp area -->
+    <path d="M130,32 L135,36 L128,36 L128,32 Z" fill="#4a8a4a"/>
+    <!-- Windows row -->
+    <rect x="25" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
+    <rect x="32" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
+    <rect x="39" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
+    <rect x="46" y="25" width="3" height="2" rx="0.5" fill="#18262e" opacity="0.6"/>
+    <!-- Nose gear -->
+    <line x1="22" y1="32" x2="22" y2="38" stroke="#4a8a4a" stroke-width="1.5"/>
+    <!-- Main gear -->
+    <line x1="72" y1="32" x2="72" y2="40" stroke="#4a8a4a" stroke-width="2"/>
+    <line x1="78" y1="32" x2="78" y2="40" stroke="#4a8a4a" stroke-width="2"/>
   </svg>
 
   <div class="header-title">
     <div class="header-name">Moose Driver</div>
-    <div class="header-sub">Travel Med Advisor · JBLM C-17</div>
+    <div class="header-sub">Travel Med Advisor · JBLM C-17 · 62d AW</div>
   </div>
 
   <div class="header-meta">
@@ -814,6 +891,30 @@ header {
   <!-- MAP SIDE -->
   <div class="map-side">
     <div class="map-overlay-label">CLICK COUNTRY TO LOOK UP</div>
+    <!-- C-17 watermark on map -->
+    <svg class="map-c17-watermark" viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- Fuselage -->
+      <path d="M40,90 Q60,68 110,68 L400,68 Q430,68 445,78 Q455,88 445,98 Q430,108 400,108 L110,108 Q60,108 40,90 Z" fill="white" opacity="0.06"/>
+      <!-- Nose -->
+      <path d="M28,90 Q22,80 40,75 L40,105 Q22,100 28,90 Z" fill="white" opacity="0.06"/>
+      <!-- Vertical stabilizer -->
+      <path d="M390,68 L410,10 L435,10 L425,68 Z" fill="white" opacity="0.06"/>
+      <!-- Horizontal stabs -->
+      <path d="M388,78 L388,68 L490,52 L490,58 Z" fill="white" opacity="0.06"/>
+      <path d="M388,98 L388,108 L490,124 L490,118 Z" fill="white" opacity="0.06"/>
+      <!-- Main wings -->
+      <path d="M160,68 L150,4 L185,4 L205,68 Z" fill="white" opacity="0.06"/>
+      <path d="M205,68 L220,4 L255,4 L248,68 Z" fill="white" opacity="0.06"/>
+      <path d="M248,68 L268,4 L295,4 L278,68 Z" fill="white" opacity="0.06"/>
+      <!-- Engine pods -->
+      <rect x="158" y="42" width="44" height="16" rx="8" fill="white" opacity="0.05"/>
+      <rect x="208" y="28" width="44" height="16" rx="8" fill="white" opacity="0.05"/>
+      <rect x="252" y="18" width="40" height="16" rx="8" fill="white" opacity="0.05"/>
+      <!-- Winglet -->
+      <path d="M278,4 L298,0 L300,8 L282,12 Z" fill="white" opacity="0.05"/>
+      <!-- Cargo ramp -->
+      <path d="M400,108 L414,120 L398,120 L398,108 Z" fill="white" opacity="0.05"/>
+    </svg>
     <div id="map"></div>
   </div>
 
@@ -964,41 +1065,51 @@ const COUNTRIES = [
 
 // Index for fast lookup
 const INDEX = {};
+
+// Primary index — every country by its exact name (lowercase)
 COUNTRIES.forEach(c => {
   INDEX[c.name.toLowerCase()] = c;
-  // Common aliases
-  const aliases = {
-    "drc":"Democratic Republic of the Congo","dr congo":"Democratic Republic of the Congo",
-    "congo kinshasa":"Democratic Republic of the Congo","congo brazzaville":"Congo",
-    "ivory coast":"Cote d'Ivoire","côte d'ivoire":"Cote d'Ivoire",
-    "myanmar":"Myanmar","burma":"Myanmar",
-    "lao pdr":"Laos","lao":"Laos","lao people's democratic republic":"Laos",
-    "viet nam":"Vietnam","korea republic":"Korea","south korea":"Korea","republic of korea":"Korea",
-    "sao tome":"Sao Tome and Principe","são tomé":"Sao Tome and Principe",
-    "eswatini":"Eswatini","swaziland":"Eswatini",
-    "french guiana":"French Guiana",
-    "dominican republic":"Dominican Republic","dr":"Dominican Republic",
-    "papua new guinea":"Papua New Guinea","png":"Papua New Guinea",
-    "solomon islands":"Solomon Islands","solomons":"Solomon Islands",
-    "central african republic":"Central African Republic","car":"Central African Republic",
-    "guinea bissau":"Guinea-Bissau",
-    "equatorial guinea":"Equatorial Guinea",
-    "sierra leone":"Sierra Leone",
-    "south africa":"South Africa",
-    "south sudan":"South Sudan",
-  };
-  if (aliases[c.name.toLowerCase()]) INDEX[c.name.toLowerCase()] = c;
+});
+
+// Alias map: common alternate names → canonical country name
+const ALIASES = {
+  "drc": "Democratic Republic of the Congo",
+  "dr congo": "Democratic Republic of the Congo",
+  "congo kinshasa": "Democratic Republic of the Congo",
+  "congo brazzaville": "Congo",
+  "republic of the congo": "Congo",
+  "ivory coast": "Cote d'Ivoire",
+  "côte d'ivoire": "Cote d'Ivoire",
+  "cote divoire": "Cote d'Ivoire",
+  "burma": "Myanmar",
+  "lao pdr": "Laos",
+  "lao people's democratic republic": "Laos",
+  "viet nam": "Vietnam",
+  "south korea": "Korea",
+  "republic of korea": "Korea",
+  "korea republic": "Korea",
+  "sao tome": "Sao Tome and Principe",
+  "são tomé and príncipe": "Sao Tome and Principe",
+  "são tomé": "Sao Tome and Principe",
+  "swaziland": "Eswatini",
+  "png": "Papua New Guinea",
+  "solomons": "Solomon Islands",
+  "central african rep": "Central African Republic",
+  "car": "Central African Republic",
+  "guinea-bissau": "Guinea-Bissau",
+  "guinea bissau": "Guinea-Bissau",
+  "south africa": "South Africa",
+  "south sudan": "South Sudan",
+  "french guiana": "French Guiana",
+  "dominican republic": "Dominican Republic",
+  "dr": "Dominican Republic",
 };
-Object.entries({
-  "drc":"Democratic Republic of the Congo","dr congo":"Democratic Republic of the Congo",
-  "congo kinshasa":"Democratic Republic of the Congo","congo brazzaville":"Congo",
-  "ivory coast":"Cote d'Ivoire","côte d'ivoire":"Cote d'Ivoire",
-  "burma":"Myanmar","lao pdr":"Laos","lao":"Laos",
-  "viet nam":"Vietnam","korea republic":"Korea","south korea":"Korea","republic of korea":"Korea",
-  "sao tome":"Sao Tome and Principe","são tomé":"Sao Tome and Principe",
-  "swaziland":"Eswatini","png":"Papua New Guinea","solomons":"Solomon Islands",
-  "car":"Central African Republic","guinea bissau":"Guinea-Bissau",
-}).forEach(([k,v]) => { INDEX[k] = INDEX[v.toLowerCase()] || COUNTRIES.find(c=>c.name===v); });
+
+// Register all aliases into INDEX
+Object.entries(ALIASES).forEach(([alias, canonical]) => {
+  const target = INDEX[canonical.toLowerCase()];
+  if (target) INDEX[alias] = target;
+});
 
 // ── RENDER RESULT ──
 function showResult(country) {
@@ -1175,26 +1286,25 @@ let geojsonLayer = null;
 let selectedLayer = null;
 
 function getMapColor(status) {
-  if (status === 'green')  return { fill: '#1a4a2a', stroke: '#2d7d4a' };
-  if (status === 'yellow') return { fill: '#3a2a08', stroke: '#c0800a' };
-  if (status === 'red')    return { fill: '#3a0f0f', stroke: '#a03030' };
-  return { fill: '#1a2a1a', stroke: '#2a3d2a' };
+  if (status === 'green')  return { fill: '#2a6e3a', stroke: '#4acc70' };
+  if (status === 'yellow') return { fill: '#5a3c08', stroke: '#f0a020' };
+  if (status === 'red')    return { fill: '#5a1818', stroke: '#d05050' };
+  return { fill: '#1e3220', stroke: '#3a5e3a' };
 }
 
 function getDefaultStyle(feature) {
-  const cname = feature.properties.name || feature.properties.NAME || '';
+  const cname = feature.properties.ADMIN || feature.properties.name || feature.properties.NAME || '';
   const c = findCountryByMapName(cname);
-  if (!c) return { fillColor: '#141f14', color: '#2a3d2a', weight: 0.8, fillOpacity: 0.85, opacity: 1 };
+  if (!c) return { fillColor: '#1e3a20', color: '#3a5e3a', weight: 0.8, fillOpacity: 0.85, opacity: 1 };
   const col = getMapColor(c.status);
   return { fillColor: col.fill, color: col.stroke, weight: 1, fillOpacity: 0.85, opacity: 1 };
 }
 
 function findCountryByMapName(mapName) {
   if (!mapName) return null;
-  const key = mapName.toLowerCase();
-  // Direct match
+  const key = mapName.toLowerCase().trim();
   if (INDEX[key]) return INDEX[key];
-  // Fuzzy
+  // Fuzzy partial match
   const found = COUNTRIES.find(c =>
     c.name.toLowerCase() === key ||
     key.includes(c.name.toLowerCase()) ||
@@ -1203,44 +1313,80 @@ function findCountryByMapName(mapName) {
   return found || null;
 }
 
-// Load GeoJSON world data
-fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-  .then(r => r.json())
-  .then(data => {
-    geojsonLayer = L.geoJSON(data, {
-      style: getDefaultStyle,
-      onEachFeature: (feature, layer) => {
-        const cname = feature.properties.ADMIN || feature.properties.name || '';
-        layer.on({
-          mouseover: (e) => {
-            const l = e.target;
-            const c = findCountryByMapName(cname);
-            l.setStyle({ weight: 2, fillOpacity: 0.95 });
-            l.bringToFront();
-            const status = c ? (c.status==='green'?'NO PROPHYLAXIS':c.status==='yellow'?'AREA-SPECIFIC':'PROPHYLAXIS REQ.') : 'NOT ENDEMIC';
-            l.bindTooltip(`<div class="map-tooltip">${cname || 'Unknown'} — ${status}</div>`, { sticky: true, className: '' }).openTooltip();
-          },
-          mouseout: (e) => {
-            if (e.target !== selectedLayer) geojsonLayer.resetStyle(e.target);
-            e.target.closeTooltip();
-          },
-          click: (e) => {
-            const c = findCountryByMapName(cname);
-            if (c) {
-              if (selectedLayer) geojsonLayer.resetStyle(selectedLayer);
-              selectedLayer = e.target;
-              e.target.setStyle({ weight: 2.5, color: '#8ec88e', fillOpacity: 0.95 });
-              selectCountry(c);
-            }
-          }
-        });
+function attachLayerEvents(layer, cname) {
+  layer.on({
+    mouseover(e) {
+      e.target.setStyle({ weight: 2, fillOpacity: 0.95 });
+      e.target.bringToFront();
+      const c = findCountryByMapName(cname);
+      const statusLabel = !c ? 'NOT ENDEMIC'
+        : c.status === 'green'  ? 'NO PROPHYLAXIS'
+        : c.status === 'yellow' ? 'AREA-SPECIFIC'
+        : 'PROPHYLAXIS REQ.';
+      e.target.bindTooltip(
+        `<div class="map-tooltip">${cname} — ${statusLabel}</div>`,
+        { sticky: true, className: '' }
+      ).openTooltip();
+    },
+    mouseout(e) {
+      if (e.target !== selectedLayer) geojsonLayer.resetStyle(e.target);
+      e.target.closeTooltip();
+    },
+    click(e) {
+      const c = findCountryByMapName(cname);
+      if (c) {
+        if (selectedLayer) geojsonLayer.resetStyle(selectedLayer);
+        selectedLayer = e.target;
+        e.target.setStyle({ weight: 2.5, color: '#8ec88e', fillOpacity: 0.95 });
+        selectCountry(c);
       }
-    }).addTo(map);
-  })
-  .catch(() => {
-    // Fail silently — search still works
-    console.log('Map data unavailable; search still functional.');
+    }
   });
+}
+
+function buildGeoLayer(data) {
+  geojsonLayer = L.geoJSON(data, {
+    style: getDefaultStyle,
+    onEachFeature(feature, layer) {
+      const cname = feature.properties.ADMIN || feature.properties.name || feature.properties.NAME || '';
+      attachLayerEvents(layer, cname);
+    }
+  }).addTo(map);
+  document.getElementById('mapStatusMsg').style.display = 'none';
+}
+
+// Show a loading message on the map while GeoJSON loads
+const mapMsg = document.createElement('div');
+mapMsg.id = 'mapStatusMsg';
+mapMsg.style.cssText = 'position:absolute;bottom:18px;left:50%;transform:translateX(-50%);z-index:900;background:rgba(26,46,26,0.9);border:1px solid #2d3f2d;padding:6px 14px;font-family:var(--mono);font-size:10px;color:#7a8f7a;letter-spacing:0.12em;border-radius:2px;pointer-events:none;';
+mapMsg.textContent = 'LOADING MAP DATA…';
+document.querySelector('.map-side').appendChild(mapMsg);
+
+// Multiple CDN fallbacks — tries each in order until one succeeds
+const GEOJSON_SOURCES = [
+  'https://cdn.jsdelivr.net/gh/datasets/geo-countries@master/data/countries.geojson',
+  'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson',
+  'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson',
+];
+
+async function loadGeoJSON() {
+  for (const url of GEOJSON_SOURCES) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      buildGeoLayer(data);
+      return; // success — stop trying
+    } catch (err) {
+      console.warn(`Map source failed: ${url}`, err);
+    }
+  }
+  // All sources failed
+  mapMsg.textContent = 'MAP UNAVAILABLE — USE SEARCH BAR ABOVE';
+  mapMsg.style.color = '#c0800a';
+}
+
+loadGeoJSON();
 
 function highlightMapCountry(name) {
   if (!geojsonLayer) return;
